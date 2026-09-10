@@ -1,0 +1,153 @@
+:root{
+  --red:#ff3b30;
+  --ink:#12140f;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#1b2016}
+body{
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Meiryo",sans-serif;
+  color:#fff; user-select:none; -webkit-user-select:none;
+}
+canvas#game{display:block;width:100vw;height:100vh;image-rendering:auto}
+
+/* ---------------- HUD ---------------- */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:5}
+#hud>*{position:absolute}
+
+#bottomLeft{left:18px;bottom:16px;width:170px}
+#minimap{
+  width:170px;height:170px;display:block;
+  border-radius:50%;
+  box-shadow:0 0 0 3px rgba(0,0,0,.45), 0 4px 14px rgba(0,0,0,.5);
+}
+.bars{margin-top:8px}
+.bar{display:flex;align-items:center;gap:6px;margin-top:4px}
+.bar .ico{font-style:normal;font-size:11px;width:12px;text-align:center;opacity:.9;
+  text-shadow:0 1px 2px #000}
+.bar .track{flex:1;height:7px;background:rgba(0,0,0,.55);border-radius:4px;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(0,0,0,.5)}
+.bar .fill{height:100%;width:100%;transition:width .12s linear;border-radius:4px}
+.fill.hp{background:linear-gradient(90deg,#ff5c4d,#ff8a7a)}
+.fill.sp{background:linear-gradient(90deg,#5ddc6b,#9df08d)}
+
+#topRight{right:20px;top:16px;text-align:right}
+#money{
+  font-size:30px;font-weight:800;letter-spacing:.5px;
+  color:#c9f57b; text-shadow:0 2px 0 rgba(0,0,0,.6), 0 0 10px rgba(0,0,0,.4);
+  font-variant-numeric:tabular-nums;
+}
+#wanted{font-size:22px;letter-spacing:3px;margin-top:2px;
+  text-shadow:0 2px 4px rgba(0,0,0,.7);min-height:26px}
+#wanted .on{color:#ffd23f}
+#wanted .off{color:rgba(255,255,255,.22)}
+
+#missionBox{left:18px;top:16px;max-width:340px}
+#missionTitle{
+  font-size:17px;font-weight:800;color:#ffd23f;
+  text-shadow:0 2px 4px rgba(0,0,0,.85);line-height:1.35
+}
+#missionTimer{font-size:22px;font-weight:800;color:#ff6b5e;
+  text-shadow:0 2px 4px rgba(0,0,0,.85);font-variant-numeric:tabular-nums}
+
+/* 動画リスペクトの赤い指示テキスト */
+#objective{
+  left:0;right:0;bottom:74px;text-align:center;
+  font-size:26px;font-weight:800;color:var(--red);
+  text-shadow:0 2px 0 rgba(0,0,0,.9), 0 0 14px rgba(0,0,0,.7);
+  letter-spacing:1px;
+  transition:opacity .2s;
+}
+#objective .sub{display:block;font-size:16px;color:#ffb3ad;margin-top:2px;font-weight:700}
+
+#hint{
+  left:0;right:0;bottom:36px;text-align:center;
+  font-size:15px;font-weight:700;color:#fff;
+  text-shadow:0 2px 4px rgba(0,0,0,.9);
+}
+#hint b{
+  display:inline-block;background:#fff;color:#111;border-radius:5px;
+  padding:1px 7px;margin-right:6px;font-size:13px;
+  box-shadow:0 2px 0 rgba(0,0,0,.5)
+}
+
+#tut{
+  left:50%;transform:translateX(-50%);top:14px;
+  background:rgba(0,0,0,.72);border-radius:6px;padding:8px 16px;
+  font-size:15px;font-weight:700;opacity:0;transition:opacity .3s;
+}
+#tut.show{opacity:1}
+
+#keys{
+  right:18px;bottom:16px;display:flex;flex-direction:column;align-items:flex-end;gap:3px;
+  font-size:11px;color:rgba(255,255,255,.75);text-shadow:0 1px 3px rgba(0,0,0,.9)
+}
+#keys b{color:#fff}
+
+#toasts{
+  left:50%;transform:translateX(-50%);top:64px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.toast{
+  background:rgba(20,22,16,.9);border-left:4px solid #ffd23f;
+  padding:8px 18px;border-radius:4px;font-size:15px;font-weight:700;
+  animation:toastIn .25s ease-out;box-shadow:0 4px 14px rgba(0,0,0,.5);
+  white-space:nowrap;
+}
+.toast.good{border-color:#7ed957}
+.toast.bad{border-color:#ff5c4d}
+.toast.fade{opacity:0;transition:opacity .5s}
+@keyframes toastIn{from{transform:translateY(-12px);opacity:0}to{transform:none;opacity:1}}
+
+/* ---------------- オーバーレイ ---------------- */
+.overlay{
+  position:fixed;inset:0;z-index:20;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  background:rgba(10,14,8,.86);backdrop-filter:blur(3px);
+}
+.overlay.hidden{display:none}
+.panel{
+  max-width:560px;padding:34px 44px;text-align:center;
+}
+.panel h1{
+  margin:0;font-size:58px;letter-spacing:2px;font-weight:900;
+  color:#ffd23f;text-shadow:0 4px 0 #7a4a00, 0 8px 22px rgba(0,0,0,.6)
+}
+.panel h1.small{font-size:34px}
+.panel h2{margin:6px 0 18px;font-size:19px;font-weight:700;color:#cfe6a8;letter-spacing:2px}
+.panel .lead{font-size:15px;line-height:1.8;color:#dfe6d4;margin:0 0 20px}
+table.ctrl{margin:0 auto 16px;border-collapse:collapse;font-size:14px}
+table.ctrl td{padding:3px 12px;text-align:left;color:#dfe6d4}
+table.ctrl td:first-child{text-align:right;color:#fff}
+table.ctrl b{background:rgba(255,255,255,.14);padding:2px 8px;border-radius:4px}
+.panel .tip{font-size:13px;color:#9fb08a;margin:0 0 22px}
+.panel .tip .ex{color:#ffd23f;font-size:16px}
+.panel button{
+  pointer-events:auto;cursor:pointer;
+  font-family:inherit;font-size:17px;font-weight:800;
+  background:#ffd23f;color:#2a1d00;border:0;border-radius:8px;
+  padding:13px 34px;box-shadow:0 4px 0 #a97f00;
+}
+.panel button:active{transform:translateY(2px);box-shadow:0 2px 0 #a97f00}
+
+#questLog{
+  text-align:left;margin:0 auto 22px;font-size:13px;line-height:1.9;
+  max-height:46vh;overflow:auto;color:#dfe6d4;min-width:340px;
+}
+#questLog .done{color:#7ed957}
+#questLog .done::before{content:"✔ ";}
+#questLog .open::before{content:"・";color:#ffd23f}
+#questLog h3{font-size:14px;color:#ffd23f;margin:10px 0 4px;border-bottom:1px solid rgba(255,255,255,.15)}
+
+#bigmapCanvas{
+  max-width:92vw;max-height:82vh;border-radius:8px;
+  box-shadow:0 10px 40px rgba(0,0,0,.7);background:#7fae5a
+}
+.mapHelp{font-size:13px;color:#9fb08a;margin-top:12px}
+
+#busted{background:rgba(120,0,0,.55)}
+.bustedText{
+  font-size:110px;font-weight:900;letter-spacing:26px;color:#fff;
+  text-shadow:0 6px 0 #6b0000, 0 0 40px rgba(0,0,0,.8);
+  animation:bust .5s ease-out;
+}
+@keyframes bust{from{transform:scale(1.5);opacity:0}to{transform:none;opacity:1}}

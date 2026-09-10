@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BABAA AUTO 〜田舎のばあちゃん無双〜</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<canvas id="game"></canvas>
+
+<!-- ================= HUD ================= -->
+<div id="hud">
+
+  <!-- 左下: ミニマップ + ステータス -->
+  <div id="bottomLeft">
+    <canvas id="minimap" width="170" height="170"></canvas>
+    <div class="bars">
+      <div class="bar"><i class="ico">&#9829;</i><div class="track"><div id="hpFill" class="fill hp"></div></div></div>
+      <div class="bar"><i class="ico">&#10034;</i><div class="track"><div id="spFill" class="fill sp"></div></div></div>
+    </div>
+  </div>
+
+  <!-- 右上: 所持金 / 村八分度 -->
+  <div id="topRight">
+    <div id="money">&yen;0</div>
+    <div id="wanted"></div>
+  </div>
+
+  <!-- 左上: ミッション名 -->
+  <div id="missionBox">
+    <div id="missionTitle"></div>
+    <div id="missionTimer"></div>
+  </div>
+
+  <!-- 下中央: 現在の指示（動画リスペクトの赤字） -->
+  <div id="objective"></div>
+
+  <!-- 中央下: 文脈ヘルプ -->
+  <div id="hint"></div>
+
+  <!-- チュートリアル小窓 -->
+  <div id="tut"></div>
+
+  <!-- トースト通知 -->
+  <div id="toasts"></div>
+
+  <!-- 右下: 操作キー -->
+  <div id="keys">
+    <span><b>WASD</b> 移動</span>
+    <span><b>Shift</b> 早足</span>
+    <span><b>E</b> 調べる/乗降</span>
+    <span><b>Space</b> 杖</span>
+    <span><b>P</b> ポーズ</span>
+  </div>
+</div>
+
+<!-- ================= タイトル ================= -->
+<div id="title" class="overlay">
+  <div class="panel">
+    <h1>BABAA AUTO</h1>
+    <h2>〜 田舎のばあちゃん無双 〜</h2>
+    <p class="lead">回覧板を届け、草をむしり、鶏を追い、ケジメをつける。<br>ここは限界集落。あなたは、ばあちゃん。</p>
+    <table class="ctrl">
+      <tr><td><b>W A S D</b></td><td>移動 / 軽トラ運転</td></tr>
+      <tr><td><b>Shift</b></td><td>早足（スタミナ消費）</td></tr>
+      <tr><td><b>E</b></td><td>話す・拾う・軽トラ乗降</td></tr>
+      <tr><td><b>Space</b></td><td>杖を振る（作業・ケジメ）</td></tr>
+      <tr><td><b>M</b></td><td>マップ拡大</td></tr>
+      <tr><td><b>P / Esc</b></td><td>ポーズ</td></tr>
+    </table>
+    <p class="tip">頭に <b class="ex">！</b> が出ている人に <b>E</b> で話しかけると仕事がもらえる。</p>
+    <button id="startBtn">Enter で はじめる</button>
+  </div>
+</div>
+
+<!-- ================= ポーズ ================= -->
+<div id="pause" class="overlay hidden">
+  <div class="panel">
+    <h1 class="small">ポーズ中</h1>
+    <div id="questLog"></div>
+    <button id="resumeBtn">P で 再開</button>
+  </div>
+</div>
+
+<!-- ================= 拡大マップ ================= -->
+<div id="bigmap" class="overlay hidden">
+  <canvas id="bigmapCanvas" width="800" height="600"></canvas>
+  <p class="mapHelp">M で閉じる</p>
+</div>
+
+<!-- ================= 御用オーバーレイ ================= -->
+<div id="busted" class="overlay hidden">
+  <div class="bustedText">御 用</div>
+</div>
+
+<script src="js/util.js"></script>
+<script src="js/world.js"></script>
+<script src="js/entities.js"></script>
+<script src="js/missions.js"></script>
+<script src="js/render.js"></script>
+<script src="js/input.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
