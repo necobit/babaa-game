@@ -203,18 +203,46 @@ function drawLabel(ctx, x, y, text, color, size) {
   ctx.restore();
 }
 
+/** 日本語は単語区切りが無いので 1 文字ずつ詰めて折り返す */
+function wrapJa(ctx, text, maxW) {
+  const lines = [];
+  let line = '';
+  for (const ch of text) {
+    if (ch === '\n') { lines.push(line); line = ''; continue; }
+    // 禁則処理：行頭に来ると具合の悪い文字は前の行に押し込む
+    if (line && ctx.measureText(line + ch).width > maxW && !NO_LINE_START.includes(ch)) {
+      lines.push(line); line = ch;
+    } else {
+      line += ch;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+const BUBBLE_LH = 18;   // 行の高さ
+// 行頭に置かない文字（句読点・閉じ括弧・小書きかな・長音）
+const NO_LINE_START = '、。，．！？」』）］｝・…ー〜っゃゅょぁぃぅぇぉッャュョァィゥェォヽヾゝゞ';
+
 function drawBubble(ctx, x, y, text) {
   ctx.save();
   ctx.font = 'bold 13px ' + JP_FONT;
-  const w = ctx.measureText(text).width + 20;
-  const h = 24;
-  ctx.fillStyle = 'rgba(255,255,255,0.94)';
+  const lines = wrapJa(ctx, text, 260);
+  let tw = 0;
+  for (const l of lines) tw = Math.max(tw, ctx.measureText(l).width);
+  const w = tw + 22;
+  const h = lines.length * BUBBLE_LH + 12;
+
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
   roundRect(ctx, x - w / 2, y - h, w, h, 8); ctx.fill();
   ctx.beginPath();
   ctx.moveTo(x - 6, y); ctx.lineTo(x, y + 7); ctx.lineTo(x + 6, y); ctx.fill();
+
   ctx.fillStyle = '#1a1a1a';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(text, x, y - h / 2);
+  for (let i = 0; i < lines.length; i++) {
+    ctx.fillText(lines[i], x, y - h + 6 + BUBBLE_LH * (i + 0.5));
+  }
   ctx.restore();
 }
 
@@ -362,8 +390,10 @@ function drawScene(ctx, G) {
     }
   }
 
-  // 目の前の対象に「Space」プロンプト
-  if (focus && focus.x != null && !p.vehicle) {
+  // 目の前の対象に「E」プロンプト。
+  // セリフの吹き出しが出ている間は重なって読めなくなるので出さない。
+  const talking = focus && focus.obj && focus.obj.talkT > 0;
+  if (focus && focus.x != null && !p.vehicle && !talking) {
     const dy = focus.type === 'talk' ? 34 : focus.type === 'ride' ? 32 : 26;
     drawKeyPrompt(ctx, focus.x, focus.y - dy, 'E', focus.label);
   }

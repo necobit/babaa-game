@@ -23,6 +23,8 @@ const Input = {
   _down: {},
 
   init() {
+    this._sync();   // 方向フラグを確実に boolean にしてから始める
+
     window.addEventListener('keydown', e => {
       const k = this._key(e);
       if (!k) return;
@@ -78,8 +80,8 @@ const Input = {
     return false;
   },
 
-  /** 押しっぱなしか */
-  down(k) { return !!this._down[k]; },
+  /** 押しっぱなしか（プロパティの down と衝突させないため isDown） */
+  isDown(k) { return !!this._down[k]; },
 
   /** 溜まった「押した瞬間」を捨てる（画面遷移で誤爆させないため） */
   flush() { this.pressed = {}; },

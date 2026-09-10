@@ -54,7 +54,7 @@ const MISSION_DEFS = [
     steps: [
       {
         type: 'action', verb: '草むしり', hits: 4, text: '畑の草をむしれ',
-        spots: [{ x: 640, y: 1970 }, { x: 760, y: 2020 }, { x: 870, y: 1960 }],
+        spots: [{ x: 640, y: 2180 }, { x: 760, y: 2255 }, { x: 870, y: 2170 }],
       },
     ],
     reward: 400,
@@ -130,7 +130,7 @@ const MISSION_DEFS = [
     id: 'tama', giver: 'tanaka', title: '猫のタマ',
     brief: 'タマが帰ってこんのじゃ。村のどこかにおるはず……',
     steps: [
-      { type: 'catch', kind: 'cat', n: 1, text: '猫のタマを探して捕まえろ', spawns: [{ x: 640, y: 2250 }] },
+      { type: 'catch', kind: 'cat', n: 1, text: '猫のタマを探して捕まえろ', spawns: [{ x: 235, y: 2265 }] },
     ],
     reward: 900,
   },
