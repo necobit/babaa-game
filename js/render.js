@@ -218,6 +218,33 @@ function drawBubble(ctx, x, y, text) {
   ctx.restore();
 }
 
+/* 対象の頭上に出す操作プロンプト */
+function drawKeyPrompt(ctx, x, y, key, text) {
+  ctx.save();
+  ctx.font = 'bold 12px ' + JP_FONT;
+  const tw = ctx.measureText(text).width;
+  const kw = Math.max(26, ctx.measureText(key).width + 14);
+  const pad = 7, gap = 6;
+  const w = pad * 2 + kw + gap + tw, h = 24;
+  const bx = x - w / 2, by = y - h;
+
+  ctx.fillStyle = 'rgba(14,17,11,0.85)';
+  roundRect(ctx, bx, by, w, h, 6); ctx.fill();
+
+  ctx.fillStyle = '#fff';
+  roundRect(ctx, bx + pad, by + 4, kw, h - 8, 4); ctx.fill();
+  ctx.fillStyle = '#111';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = 'bold 11px ' + JP_FONT;
+  ctx.fillText(key, bx + pad + kw / 2, by + h / 2 + 0.5);
+
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 12px ' + JP_FONT;
+  ctx.fillText(text, bx + pad + kw + gap, by + h / 2 + 0.5);
+  ctx.restore();
+}
+
 /* ---------------- エフェクト ---------------- */
 function drawEffect(ctx, e) {
   const t = e.life / e.max;
@@ -281,6 +308,7 @@ function drawScene(ctx, G) {
   }
 
   const inView = (x, y, pad) => x > vx - pad && x < vx + vw + pad && y > vy - pad && y < vy + vh + pad;
+  const focus = G.focus;
 
   // マーカー（地面の上）
   for (const m of G.markers) if (inView(m.x, m.y, 120)) drawMarker(ctx, m, G.time);
@@ -315,6 +343,7 @@ function drawScene(ctx, G) {
     }
 
     if (n.talkT > 0) drawBubble(ctx, n.x, n.y - 34, n.talk);
+    else if (focus && focus.obj === n) { /* 頭上にプロンプトが出るので名前と「！」は省く */ }
     else if (n.kind === 'giver' && Missions.hasWork(n.id)) drawBang(ctx, n, G.time);
     else if (n.kind === 'giver' || n.kind === 'fixed') drawLabel(ctx, n.x, n.y - 28, n.name, '#e8f0d8', 11);
   }
@@ -331,6 +360,12 @@ function drawScene(ctx, G) {
       drawLabel(ctx, p.x + 14, p.y - 20, '×' + p.carry, '#fff', 11);
       ctx.restore();
     }
+  }
+
+  // 目の前の対象に「Space」プロンプト
+  if (focus && focus.x != null && !p.vehicle) {
+    const dy = focus.type === 'talk' ? 34 : focus.type === 'ride' ? 32 : 26;
+    drawKeyPrompt(ctx, focus.x, focus.y - dy, 'Space', focus.label);
   }
 
   // エフェクト

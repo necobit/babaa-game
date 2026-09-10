@@ -135,12 +135,14 @@ function resetGame() {
 
 function startGame() {
   Sfx.ensure();
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   setState('play');
-  tut('WASD で移動 ／ Shift 長押しで早足', 7);
+  tut('WASD で移動 ／ Shift 長押しで早足 ／ Space で調べる', 8);
 }
 
 function setState(s) {
   G.state = s;
+  Input.flush();
   el.title.classList.toggle('hidden', s !== 'title');
   el.pause.classList.toggle('hidden', s !== 'pause');
   el.bigmap.classList.toggle('hidden', s !== 'map');
@@ -169,14 +171,14 @@ function frame(ts) {
 
 function handleGlobalKeys() {
   if (G.state === 'title') {
-    if (Input.hit('enter') || Input.hit(' ')) startGame();
+    if (Input.hitAny(KEYS.interact)) startGame();
     return;
   }
-  if (Input.hit('p') || Input.hit('escape')) {
+  if (Input.hitAny(KEYS.pause)) {
     if (G.state === 'play') setState('pause');
     else if (G.state === 'pause') setState('play');
   }
-  if (Input.hit('m')) {
+  if (Input.hitAny(KEYS.map)) {
     if (G.state === 'play') setState('map');
     else if (G.state === 'map') setState('play');
   }
@@ -190,8 +192,9 @@ function update(dt) {
   const p = G.player;
 
   // --- 操作 ---
-  if (Input.hit('e')) doInteract();
-  if (Input.hit(' ') && !p.vehicle) doSwing();
+  // 対象が目の前にあるときは Space が優先で「調べる」。杖は J / 左クリック。
+  if (Input.hitAny(KEYS.interact)) doInteract();
+  if ((Input.hitAny(KEYS.attack) || Input.hit('@click')) && !p.vehicle) doSwing();
 
   // --- 移動 ---
   if (p.vehicle) {
@@ -433,19 +436,20 @@ function findFocus() {
     if (!best || d < best.d) best = { d, ...obj };
   };
 
-  for (const v of G.vehicles) consider(dist(p.x, p.y, v.x, v.y), 58, { type: 'ride', obj: v, label: '軽トラに乗る' });
-  for (const it of G.items) if (!it.taken) consider(dist(p.x, p.y, it.x, it.y), 44, { type: 'pick', obj: it, label: (it.label || '拾う') + 'を拾う' });
-  for (const c of G.critters) if (!c.caught) consider(dist(p.x, p.y, c.x, c.y), 36, { type: 'catch', obj: c, label: (c.kind === 'cat' ? '猫' : '鶏') + 'を捕まえる' });
+  for (const v of G.vehicles) consider(dist(p.x, p.y, v.x, v.y), 70, { type: 'ride', obj: v, label: '軽トラに乗る' });
+  for (const it of G.items) if (!it.taken) consider(dist(p.x, p.y, it.x, it.y), 56, { type: 'pick', obj: it, label: (it.label || '拾う') + 'を拾う' });
+  for (const c of G.critters) if (!c.caught) consider(dist(p.x, p.y, c.x, c.y), 46, { type: 'catch', obj: c, label: (c.kind === 'cat' ? '猫' : '鶏') + 'を捕まえる' });
   for (const n of G.npcs) {
     if (n.kind === 'cop') continue;
     const work = n.kind === 'giver' && Missions.hasWork(n.id);
-    const need = Missions.active && Missions.step() && Missions.step().type === 'talk' && Missions.step().who === n.id;
-    const label = work ? `${n.name}の仕事を受ける` : need ? `${n.name}と話す` : `${n.name}と話す`;
-    consider(dist(p.x, p.y, n.x, n.y), 62, { type: 'talk', obj: n, label });
+    const label = work ? `${n.name}の仕事を受ける` : `${n.name}と話す`;
+    // 仕事をくれる人は少し遠くからでも拾えるようにする
+    consider(dist(p.x, p.y, n.x, n.y), work ? 92 : 82, { type: 'talk', obj: n, label });
   }
-  if (dist(p.x, p.y, SPOT.homeBed.x, SPOT.homeBed.y + 120) < 60 && p.hp < p.maxHp) {
-    consider(0.1, 60, { type: 'rest', label: 'ひと休みする' });
+  if (dist(p.x, p.y, SPOT.homeDoor.x, SPOT.homeDoor.y) < 70 && p.hp < p.maxHp) {
+    consider(0.1, 70, { type: 'rest', label: 'ひと休みする', x: SPOT.homeDoor.x, y: SPOT.homeDoor.y });
   }
+  if (best && best.obj) { best.x = best.obj.x; best.y = best.obj.y; }
   return best;
 }
 
@@ -585,7 +589,9 @@ function updateHUD() {
   if (hudCache.ob !== obHtml) { el.objective.innerHTML = obHtml; hudCache.ob = obHtml; }
 
   const f = G.focus;
-  const hintHtml = f ? `<b>E</b>${f.label}` : '';
+  const hintHtml = f
+    ? (f.type === 'exit' ? `<b>Space</b>${f.label}` : `<b>Space</b>${f.label}`)
+    : (G.player.vehicle ? '' : '<b>J</b>杖を振る');
   if (hudCache.hint !== hintHtml) { el.hint.innerHTML = hintHtml; hudCache.hint = hintHtml; }
 }
 
