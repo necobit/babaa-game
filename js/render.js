@@ -365,7 +365,7 @@ function drawScene(ctx, G) {
   // 目の前の対象に「Space」プロンプト
   if (focus && focus.x != null && !p.vehicle) {
     const dy = focus.type === 'talk' ? 34 : focus.type === 'ride' ? 32 : 26;
-    drawKeyPrompt(ctx, focus.x, focus.y - dy, 'Space', focus.label);
+    drawKeyPrompt(ctx, focus.x, focus.y - dy, 'E', focus.label);
   }
 
   // エフェクト

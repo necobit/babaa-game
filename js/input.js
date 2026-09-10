@@ -1,19 +1,21 @@
 'use strict';
 /* ========== 入力 ==========
-   移動は WASD（左手）。
-   「調べる」は親指の Space に置いて、移動しながらでも押せるようにする。
-   「杖」は右手の J（左クリックでも可）。E / Enter / F などは互換用のエイリアス。
+   移動は矢印キー（右手）。右 Shift が真隣なので早足はそこ。
+   右手が矢印キーに乗るぶん左手が空くので、「調べる」は左手の E。
+   「杖」は連打しやすい親指の Space（Z / X / 左クリックでも可）。
+   WASD・J・K・F・Enter は互換用のエイリアスとして残してある。
 --------------------------------------------------------------- */
 
 const KEYS = {
-  interact: [' ', 'e', 'enter'],
-  attack:   ['j', 'k', 'f'],
+  interact: ['e', 'enter'],
+  attack:   [' ', 'z', 'x', 'j', 'k', 'f'],
+  start:    ['e', 'enter', ' '],
   pause:    ['p', 'escape'],
   map:      ['m', 'tab'],
 };
 
-const PREVENT = ['w', 'a', 's', 'd', ' ', 'e', 'j', 'k', 'f', 'p', 'm', 'tab',
-  'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
+const PREVENT = ['arrowup', 'arrowdown', 'arrowleft', 'arrowright',
+  'w', 'a', 's', 'd', ' ', 'e', 'z', 'x', 'j', 'k', 'f', 'p', 'm', 'tab'];
 
 const Input = {
   up: false, down: false, left: false, right: false, run: false,

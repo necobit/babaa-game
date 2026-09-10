@@ -137,7 +137,7 @@ function startGame() {
   Sfx.ensure();
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   setState('play');
-  tut('WASD で移動 ／ Shift 長押しで早足 ／ Space で調べる', 8);
+  tut('矢印キーで移動 ／ Shift 長押しで早足 ／ E で調べる', 8);
 }
 
 function setState(s) {
@@ -171,7 +171,7 @@ function frame(ts) {
 
 function handleGlobalKeys() {
   if (G.state === 'title') {
-    if (Input.hitAny(KEYS.interact)) startGame();
+    if (Input.hitAny(KEYS.start)) startGame();
     return;
   }
   if (Input.hitAny(KEYS.pause)) {
@@ -502,7 +502,7 @@ function enterVehicle(v) {
   const p = G.player;
   p.vehicle = v; v.driver = p;
   p.vx = p.vy = 0;
-  tut('W 前進 ／ S ブレーキ・バック ／ A D ハンドル', 6);
+  tut('↑ 前進 ／ ↓ ブレーキ・バック ／ ← → ハンドル', 6);
   Sfx.pick();
 }
 
@@ -590,8 +590,8 @@ function updateHUD() {
 
   const f = G.focus;
   const hintHtml = f
-    ? (f.type === 'exit' ? `<b>Space</b>${f.label}` : `<b>Space</b>${f.label}`)
-    : (G.player.vehicle ? '' : '<b>J</b>杖を振る');
+    ? `<b>E</b>${f.label}`
+    : (G.player.vehicle ? '' : '<b>Space</b>杖を振る');
   if (hudCache.hint !== hintHtml) { el.hint.innerHTML = hintHtml; hudCache.hint = hintHtml; }
 }
 
