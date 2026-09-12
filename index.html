@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BABAA AUTO 〜田舎のばあちゃん無双〜</title>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=20260912a">
 </head>
 <body>
 
@@ -46,6 +46,9 @@
   <!-- 世界の中に出す文字（名前・セリフ・操作プロンプト） -->
   <div id="worldLabels"></div>
 
+  <!-- 入力デバッグ（F1 / ` で表示）-->
+  <div id="debug" class="hidden"></div>
+
   <!-- トースト通知 -->
   <div id="toasts"></div>
 
@@ -76,6 +79,7 @@
     </table>
     <p class="tip">頭に <b class="ex">！</b> が出ている人に <b>E</b> で話しかけると仕事がもらえる。</p>
     <button id="startBtn">Enter で はじめる</button>
+    <p class="build">build <span id="buildTag"></span>　／　<b>F1</b> か <b>`</b> で入力デバッグ表示</p>
   </div>
 </div>
 
@@ -99,14 +103,14 @@
   <div class="bustedText">御 用</div>
 </div>
 
-<script src="js/vendor/three.min.js"></script>
-<script src="js/util.js"></script>
-<script src="js/world.js"></script>
-<script src="js/entities.js"></script>
-<script src="js/missions.js"></script>
-<script src="js/minimap.js"></script>
-<script src="js/render3d.js"></script>
-<script src="js/input.js"></script>
-<script src="js/game.js"></script>
+<script src="js/vendor/three.min.js?v=20260912a"></script>
+<script src="js/util.js?v=20260912a"></script>
+<script src="js/world.js?v=20260912a"></script>
+<script src="js/entities.js?v=20260912a"></script>
+<script src="js/missions.js?v=20260912a"></script>
+<script src="js/minimap.js?v=20260912a"></script>
+<script src="js/render3d.js?v=20260912a"></script>
+<script src="js/input.js?v=20260912a"></script>
+<script src="js/game.js?v=20260912a"></script>
 </body>
 </html>

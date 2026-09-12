@@ -1,6 +1,9 @@
 'use strict';
 /* ========== ゲーム本体 ========== */
 
+/* 読み込まれている版。index.html の ?v= と一致していなければキャッシュが古い */
+const BUILD = '20260912a';
+
 const G = {
   state: 'title',           // title | play | pause | map | busted
   time: 0,
@@ -31,7 +34,8 @@ const el = {};
 function grabDOM() {
   const ids = ['game', 'minimap', 'title', 'pause', 'bigmap', 'bigmapCanvas', 'busted',
     'hpFill', 'spFill', 'money', 'wanted', 'missionTitle', 'missionTimer',
-    'objective', 'hint', 'tut', 'toasts', 'questLog', 'startBtn', 'resumeBtn'];
+    'objective', 'hint', 'tut', 'toasts', 'questLog', 'startBtn', 'resumeBtn',
+    'debug', 'buildTag'];
   for (const id of ids) el[id] = document.getElementById(id);
 }
 
@@ -102,6 +106,7 @@ function init() {
   resize();
   window.addEventListener('resize', resize);
 
+  el.buildTag.textContent = BUILD;
   el.startBtn.addEventListener('click', startGame);
   el.resumeBtn.addEventListener('click', () => setState('play'));
 
@@ -182,6 +187,9 @@ function handleGlobalKeys() {
   if (Input.hitAny(KEYS.pause)) {
     if (G.state === 'play') setState('pause');
     else if (G.state === 'pause') setState('play');
+  }
+  if (Input.hitAny(KEYS.debug)) {
+    el.debug.classList.toggle('hidden');
   }
   if (Input.hitAny(KEYS.camera)) {
     G.toast('カメラ: ' + (R3.toggleCam() === 'fixed' ? '向き固定' : '背後に追従'));
@@ -552,6 +560,25 @@ function render() {
   R3.drawLabels(G);
   drawMinimap(el.minimap.getContext('2d'), G);
   updateHUD();
+  if (!el.debug.classList.contains('hidden')) updateDebug();
+}
+
+/* ---- 入力デバッグ表示（F1 / ` でトグル）---- */
+let dbgT = 0;
+function updateDebug() {
+  if (performance.now() - dbgT < 100) return;
+  dbgT = performance.now();
+  const p = G.player, I = Input;
+  const held = Object.keys(I._down).filter(k => I._down[k]);
+  const f = (n) => (n >= 0 ? ' ' : '') + n.toFixed(0);
+  el.debug.innerHTML =
+    `<b>build</b>  ${BUILD}\n` +
+    `<b>keys</b>   ${held.length ? held.join(' ') : '(なし)'}\n` +
+    `<b>flags</b>  up:${+I.up} down:${+I.down} left:${+I.left} right:${+I.right} run:${+I.run}\n` +
+    `<b>pos</b>    ${f(p.x)}, ${f(p.y)}   <b>vel</b> ${f(p.vx)}, ${f(p.vy)}\n` +
+    `<b>camera</b> ${R3.camMode}  yaw ${R3.camYaw.toFixed(2)}  ` +
+    `basis f(${R3.basis.fx.toFixed(2)},${R3.basis.fz.toFixed(2)}) r(${R3.basis.rx.toFixed(2)},${R3.basis.rz.toFixed(2)})\n` +
+    `<b>state</b>  ${G.state}  車:${p.vehicle ? 'あり' : 'なし'}  three r${THREE.REVISION}`;
 }
 
 let hudCache = {};
