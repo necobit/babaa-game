@@ -43,6 +43,9 @@
   <!-- チュートリアル小窓 -->
   <div id="tut"></div>
 
+  <!-- 世界の中に出す文字（名前・セリフ・操作プロンプト） -->
+  <div id="worldLabels"></div>
+
   <!-- トースト通知 -->
   <div id="toasts"></div>
 
@@ -52,7 +55,7 @@
     <span><b>Shift</b> 早足</span>
     <span><b>E</b> 調べる/話す/乗降</span>
     <span><b>Space</b> または <b>左クリック</b> 杖</span>
-    <span><b>M</b> マップ　<b>P</b> ポーズ</span>
+    <span><b>C</b> カメラ切替　<b>M</b> マップ　<b>P</b> ポーズ</span>
   </div>
 </div>
 
@@ -67,6 +70,7 @@
       <tr><td><b>Shift</b></td><td>早足（スタミナ消費）</td></tr>
       <tr><td><b>E</b></td><td>話す・拾う・捕まえる・軽トラ乗降</td></tr>
       <tr><td><b>Space</b> / 左クリック</td><td>杖を振る（草むしり・ケジメ）</td></tr>
+      <tr><td><b>C</b></td><td>カメラ（向き固定 ⇄ 背後に追従）</td></tr>
       <tr><td><b>M</b></td><td>マップ拡大</td></tr>
       <tr><td><b>P / Esc</b></td><td>ポーズ</td></tr>
     </table>
@@ -95,11 +99,13 @@
   <div class="bustedText">御 用</div>
 </div>
 
+<script src="js/vendor/three.min.js"></script>
 <script src="js/util.js"></script>
 <script src="js/world.js"></script>
 <script src="js/entities.js"></script>
 <script src="js/missions.js"></script>
-<script src="js/render.js"></script>
+<script src="js/minimap.js"></script>
+<script src="js/render3d.js"></script>
 <script src="js/input.js"></script>
 <script src="js/game.js"></script>
 </body>

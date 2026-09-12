@@ -64,6 +64,24 @@ const WORLD = {
   props: [],
 };
 
+/* ---- 3D 用の寸法（ワールド 1 単位 ≒ 7cm。ばあちゃんの背丈が約 28 単位）---- */
+const D3 = {
+  wallH: 36,       // 建物の壁の高さ
+  roofH: 22,       // 屋根の高さ
+  eave: 7,         // 軒の出
+  mountainH: 150,  // 山の標高
+  riverDepth: 10,  // 川底の深さ
+};
+
+/** 地形の標高。山だけ盛り上げて、あとは平ら */
+function terrainHeight(x, z) {
+  const m = WORLD.mountain;
+  const d = Math.hypot(x - m.x, z - m.y);
+  if (d >= m.r) return 0;
+  const t = 1 - d / m.r;
+  return D3.mountainH * t * t * (3 - 2 * t);   // なめらかな裾野
+}
+
 /* よく使う座標に名前を付けておく */
 const SPOT = {
   homeDoor:   { x: 250,  y: 1680 },
@@ -167,9 +185,11 @@ function generateProps() {
 }
 
 /* ---------------------------------------------------------
-   背景を 1 枚のオフスクリーンキャンバスに焼く
+   地面を 1 枚のオフスクリーンキャンバスに焼く。
+   withProps=false … 3D の地面テクスチャ用（建物・木は 3D 形状で出すので描かない）
+   withProps=true  … ミニマップ／拡大マップ用
 --------------------------------------------------------- */
-function bakeGround() {
+function bakeGround(withProps) {
   const c = document.createElement('canvas');
   c.width = WORLD.w; c.height = WORLD.h;
   const g = c.getContext('2d');
@@ -259,14 +279,17 @@ function bakeGround() {
   g.fillStyle = 'rgba(200,180,120,0.35)';
   g.beginPath(); g.arc(s.x, s.y, s.r, 0, TAU); g.fill();
 
-  // 建物
-  for (const b of WORLD.buildings) drawBuilding(g, b);
-
-  // 小物
-  for (const p of WORLD.props) drawProp(g, p);
-
-  // 木
-  for (const t of WORLD.trees) drawTree(g, t);
+  if (withProps) {
+    for (const b of WORLD.buildings) drawBuilding(g, b);
+    for (const p of WORLD.props) drawProp(g, p);
+    for (const t of WORLD.trees) drawTree(g, t);
+  } else {
+    // 3D 側は建物・木を立体で出すので、地面には影の当たりだけ薄く敷く
+    for (const b of WORLD.buildings) {
+      g.fillStyle = 'rgba(0,0,0,0.12)';
+      g.fillRect(b.x - 4, b.y - 4, b.w + 8, b.h + 8);
+    }
+  }
 
   return c;
 }

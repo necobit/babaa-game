@@ -12,10 +12,11 @@ const KEYS = {
   start:    ['e', 'enter', ' '],
   pause:    ['p', 'escape'],
   map:      ['m', 'tab'],
+  camera:   ['c'],
 };
 
 const PREVENT = ['arrowup', 'arrowdown', 'arrowleft', 'arrowright',
-  'w', 'a', 's', 'd', ' ', 'e', 'z', 'x', 'j', 'k', 'f', 'p', 'm', 'tab'];
+  'w', 'a', 's', 'd', ' ', 'e', 'z', 'x', 'j', 'k', 'f', 'p', 'm', 'c', 'tab'];
 
 const Input = {
   up: false, down: false, left: false, right: false, run: false,

@@ -92,8 +92,12 @@ function init() {
   Input.init();
 
   generateProps();
-  G.ground = bakeGround();
+  G.ground  = bakeGround(true);    // ミニマップ／拡大マップ用（建物・木こみ）
+  G.terrain = bakeGround(false);   // 3D の地面テクスチャ用
   G.colliders = buildColliders();
+
+  R3.init(el.game, G.terrain);
+  Labels.init(document.getElementById('worldLabels'));
 
   resize();
   window.addEventListener('resize', resize);
@@ -106,12 +110,9 @@ function init() {
 }
 
 function resize() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const w = window.innerWidth, h = window.innerHeight;
-  G.view.w = w; G.view.h = h;
-  el.game.width = Math.floor(w * dpr);
-  el.game.height = Math.floor(h * dpr);
-  G.dpr = dpr;
+  G.view.w = window.innerWidth;
+  G.view.h = window.innerHeight;
+  R3.resize();
 }
 
 function resetGame() {
@@ -130,7 +131,6 @@ function resetGame() {
   G.wanted = 0; G.wantedDecay = 0; G.copCatch = 0;
   G.time = 0;
   Missions.reset();
-  G.cam.x = G.player.x; G.cam.y = G.player.y;
 }
 
 function startGame() {
@@ -159,12 +159,17 @@ function frame(ts) {
   const dt = Math.min(0.05, (ts - last) / 1000 || 0);
   last = ts;
 
-  handleGlobalKeys();
+  try {
+    handleGlobalKeys();
 
-  if (G.state === 'play') update(dt);
-  else if (G.state === 'busted') updateBusted(dt);
+    if (G.state === 'play') update(dt);
+    else if (G.state === 'busted') updateBusted(dt);
 
-  render();
+    render();
+  } catch (err) {
+    // 1 フレームの失敗でループごと死なせない
+    console.error('frame error:', err);
+  }
   Input.endFrame();
   requestAnimationFrame(frame);
 }
@@ -177,6 +182,9 @@ function handleGlobalKeys() {
   if (Input.hitAny(KEYS.pause)) {
     if (G.state === 'play') setState('pause');
     else if (G.state === 'pause') setState('play');
+  }
+  if (Input.hitAny(KEYS.camera)) {
+    G.toast('カメラ: ' + (R3.toggleCam() === 'fixed' ? '向き固定' : '背後に追従'));
   }
   if (Input.hitAny(KEYS.map)) {
     if (G.state === 'play') setState('map');
@@ -208,7 +216,7 @@ function update(dt) {
         { life: 0.4, color: 'rgba(180,170,150,0.55)' });
     }
   } else {
-    p.update(dt, Input);
+    p.update(dt, Input, R3.basis);
     collideActor(p);
   }
   // 他の軽トラも慣性で止める
@@ -263,12 +271,7 @@ function update(dt) {
   if (p.hp <= 0) busted('のびてしまった');
 
   // --- カメラ ---
-  const target = p.vehicle || p;
-  const k = 1 - Math.pow(0.0008, dt);
-  G.cam.x = lerp(G.cam.x, target.x, k);
-  G.cam.y = lerp(G.cam.y, target.y, k);
-  G.cam.zoom = lerp(G.cam.zoom, p.vehicle ? 0.82 : 1.0, 1 - Math.pow(0.05, dt));
-  clampCamera();
+  R3.updateCamera(dt, G);
 
   // --- フォーカス（E で何ができるか） ---
   G.focus = findFocus();
@@ -276,14 +279,6 @@ function update(dt) {
   // --- チュートリアル ---
   if (tutT > 0) { tutT -= dt; if (tutT <= 0) { el.tut.classList.remove('show'); tutText = ''; } }
   if (!Missions.active && G.time > 8 && G.time < 9) tut('頭に「！」が出とる人に E で話しかけろ', 6);
-}
-
-function clampCamera() {
-  const vw = G.view.w / G.cam.zoom, vh = G.view.h / G.cam.zoom;
-  if (vw >= WORLD.w) G.cam.x = WORLD.w / 2;
-  else G.cam.x = clamp(G.cam.x, vw / 2, WORLD.w - vw / 2);
-  if (vh >= WORLD.h) G.cam.y = WORLD.h / 2;
-  else G.cam.y = clamp(G.cam.y, vh / 2, WORLD.h - vh / 2);
 }
 
 /* ---------------- 衝突 ---------------- */
@@ -417,7 +412,7 @@ function updateBusted(dt) {
     p.x = SPOT.homeDoor.x + 40; p.y = SPOT.homeDoor.y + 60;
     p.hp = 70; p.sp = 100; p.carry = 0;
     p.vx = p.vy = 0;
-    G.cam.x = p.x; G.cam.y = p.y;
+    R3.snapCamera(G);
     setState('play');
     if (G.bustLost > 0) G.toast(`治療費と迷惑料で ${yen(G.bustLost)} 取られた`, 'bad');
   }
@@ -551,11 +546,10 @@ function doSwing() {
 /* =========================================================
    描画 + HUD
 ========================================================= */
-let _ctx = null;
 function render() {
-  const ctx = _ctx || (_ctx = el.game.getContext('2d'));
-  ctx.setTransform(G.dpr, 0, 0, G.dpr, 0, 0);
-  drawScene(ctx, G);
+  R3.sync(G);
+  R3.render();
+  R3.drawLabels(G);
   drawMinimap(el.minimap.getContext('2d'), G);
   updateHUD();
 }

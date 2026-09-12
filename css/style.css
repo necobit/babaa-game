@@ -14,6 +14,38 @@ canvas#game{display:block;width:100vw;height:100vh;image-rendering:auto}
 #hud{position:fixed;inset:0;pointer-events:none;z-index:5}
 #hud>*{position:absolute}
 
+/* --- 世界の中に浮かぶ文字 --- */
+#worldLabels{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.wlabel{
+  position:absolute;left:0;top:0;
+  transform-origin:0 0;
+  white-space:nowrap;font-weight:700;line-height:1.35;
+  will-change:transform;
+}
+.wlabel.bldg{font-size:13px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.85),0 0 3px rgba(0,0,0,.9)}
+.wlabel.name{font-size:12px;color:#e8f0d8;text-shadow:0 2px 4px rgba(0,0,0,.9)}
+.wlabel.name.cop{color:#9fd0ff}
+.wlabel.bang{font-size:30px;color:#ffd23f;text-shadow:0 2px 5px rgba(0,0,0,.9);animation:bangBob .8s ease-in-out infinite alternate}
+@keyframes bangBob{from{margin-top:0}to{margin-top:-7px}}
+.wlabel.pop{font-size:16px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.85)}
+.wlabel.bubble{
+  background:rgba(255,255,255,.95);color:#1a1a1a;border-radius:9px;
+  padding:7px 11px;font-size:13px;max-width:240px;white-space:normal;text-align:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.35);
+}
+.wlabel.bubble::after{
+  content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;
+  border:6px solid transparent;border-top-color:rgba(255,255,255,.95);border-bottom:0;
+}
+.wlabel.prompt{
+  background:rgba(14,17,11,.86);border-radius:6px;padding:4px 9px;font-size:12px;color:#fff;
+  box-shadow:0 3px 10px rgba(0,0,0,.4);
+}
+.wlabel.prompt b{
+  display:inline-block;background:#fff;color:#111;border-radius:4px;
+  padding:0 6px;margin-right:6px;font-size:11px;
+}
+
 #bottomLeft{left:18px;bottom:16px;width:170px}
 #minimap{
   width:170px;height:170px;display:block;

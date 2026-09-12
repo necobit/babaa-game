@@ -23,8 +23,8 @@ class Player {
 
   get moving() { return Math.hypot(this.vx, this.vy) > 8; }
 
-  /** 徒歩の更新 */
-  update(dt, input) {
+  /** 徒歩の更新。basis があれば入力をカメラ基準の向きに読み替える */
+  update(dt, input, basis) {
     if (this.vehicle) return;
 
     let ix = 0, iy = 0;
@@ -34,6 +34,14 @@ class Player {
     if (input.down)  iy += 1;
     const len = Math.hypot(ix, iy);
     if (len > 0) { ix /= len; iy /= len; }
+
+    if (basis && len > 0) {
+      // 右方向 * 横入力 + 前方 * 前入力（上キーは iy = -1）
+      const dx = basis.rx * ix + basis.fx * (-iy);
+      const dy = basis.rz * ix + basis.fz * (-iy);
+      const dl = Math.hypot(dx, dy) || 1;
+      ix = dx / dl; iy = dy / dl;
+    }
 
     const wantRun = input.run && this.sp > 1 && len > 0;
     let speed = wantRun ? RUN_SPEED : WALK_SPEED;
