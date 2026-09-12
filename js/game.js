@@ -2,7 +2,7 @@
 /* ========== ゲーム本体 ========== */
 
 /* 読み込まれている版。index.html の ?v= と一致していなければキャッシュが古い */
-const BUILD = '20260912a';
+const BUILD = '20260912b';
 
 const G = {
   state: 'title',           // title | play | pause | map | busted
@@ -578,7 +578,8 @@ function updateDebug() {
     `<b>pos</b>    ${f(p.x)}, ${f(p.y)}   <b>vel</b> ${f(p.vx)}, ${f(p.vy)}\n` +
     `<b>camera</b> ${R3.camMode}  yaw ${R3.camYaw.toFixed(2)}  ` +
     `basis f(${R3.basis.fx.toFixed(2)},${R3.basis.fz.toFixed(2)}) r(${R3.basis.rx.toFixed(2)},${R3.basis.rz.toFixed(2)})\n` +
-    `<b>state</b>  ${G.state}  車:${p.vehicle ? 'あり' : 'なし'}  three r${THREE.REVISION}`;
+    `<b>state</b>  ${G.state}  車:${p.vehicle ? 'あり' : 'なし'}  three r${THREE.REVISION}\n` +
+    `<b>raw</b>    ${I.raw.length ? I.raw.join('\n       ') : '(イベントが届いていない)'}`;
 }
 
 let hudCache = {};
